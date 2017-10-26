@@ -1,0 +1,8 @@
+---
+applications:
+ - name: ChefGabrielReceipes
+   random-route: true
+   path: target/ChefGabrielReceipes.war
+   memory: 256M
+   instances: 1
+   buildpack: java_buildpack

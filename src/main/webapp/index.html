@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gabriel Recipes</title>
+
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+</head>
+
+<body  background="images/food.png" alt="Gabriel's food">
+    <div class="container">
+       <div class="highcenter">
+        <h1>Gabriel Recipes</h1>
+            <p >Recipes for good food.</p>
+            <select id="selectRecipe">
+    		<option>Choose a recipe</option>
+  			</select>
+  			<select id="selectLanguage">
+    		<option>Choose a language</option>
+  			</select>
+        </div>
+        
+        <div class="lowcenter" ><p id="response" ></p>
+        </div>
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script>
+      //Submit data when language is changed
+        $('#selectLanguage').change(function() {
+        	var recipeName = $('#selectRecipe').val();
+        	var translatedLanguage = $('#selectLanguage').val();
+            	//POST request to API to retrieve recipe and translation
+                $.ajax({
+				  method: "POST",
+				  url: "./api/reciperequestapi",
+				  contentType: "application/json",
+				  data: JSON.stringify({recipeName: recipeName, translatedLanguage: translatedLanguage })
+				})
+                .done(function(data) {	
+                    $('#response').html(data);
+                });
+        });
+      
+      //Submit data when recipe is changed
+        $('#selectRecipe').change(function() {
+        	var recipeName = $('#selectRecipe').val();
+        	var translatedLanguage = $('#selectLanguage').val();
+        	//POST request to API to retrieve recipe and translation
+                $.ajax({
+				  method: "POST",
+				  url: "./api/reciperequestapi",
+				  contentType: "application/json",
+				  data: JSON.stringify({recipeName: recipeName, translatedLanguage: translatedLanguage })
+				})
+                .done(function(data) {	
+                    $('#response').html(data);
+                });
+        });
+        //Retreive all the recipes from the database
+        function getRecipeNames(callback){
+          $.get("./api/recipes")
+          .done(function(data) {
+              if(callback) callback(data);
+           });
+          }
+        
+        getRecipeNames(function(data){
+        	var recipeNames =  $.map(data, function(el) { return el });
+        	$('#selectRecipe').html('');
+        	var option = '';
+        	for (var i=0;i<recipeNames.length;i++){
+        	   option += '<option value="'+ recipeNames[i] + '">' + recipeNames[i] + '</option>';
+        	}
+        	$('#selectRecipe').append('<option>Choose a recipe</option>');
+        	$('#selectRecipe').append(option);
+        });
+        
+        function populateLanguages(callback){
+            $.get("./api/languages")
+                .done(function(data) {
+                   if(callback) callback(data);
+                });
+            }
+        
+        populateLanguages(function(data){
+        	//$('#langss').html("langss: " + JSON.stringify(data));
+        	var languages =  $.map(data, function(el) { return el });
+        	$('#selectLanguage').html('');
+        	var option = '';
+        	for (var i=0;i<languages.length;i++){
+        	   option += '<option value="'+ languages[i] + '">' + languages[i] + '</option>';
+        	}
+        	$('#selectLanguage').append('<option>Choose a language</option>');
+        	$('#selectLanguage').append(option);
+        });
+        
+        populateLanguages();
+        //Call getRecipeNames on page load.
+          getRecipeNames();
+        
+          
+    </script>
+</body>
+
+</html>
